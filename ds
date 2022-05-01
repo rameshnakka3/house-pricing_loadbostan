@@ -1,0 +1,25 @@
+from flask import Flask, render_template, request
+import numpy as np
+import pickle
+import click
+
+
+model = pickle.load(open(r'model.pkl','rb'))
+
+app = Flask(__name__)
+
+@app.route("/predict", methods=['POST'])
+def home():
+    if request.method=="POST":
+        input_dict = request.form.to_dict()
+        input_values = input_dict.values()
+        input_values = list(map(float, list(input_values)))
+        input_values = np.array(input_values)
+        input_values = input_values.reshape(1, -1)
+        prediction = model.predict(input_values)[0]
+        return prediction
+    return render_template("index.html")
+
+
+if __name__=="main_":
+    app.run(debug=True)
